@@ -1,25 +1,33 @@
-# 🎈 Blank app template
+# 📊 Colliers AI | Mass Appraisal & XAI Dashboard
 
-A simple Streamlit app template for you to modify!
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-1793D1?style=for-the-badge&logo=xgboost&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+## Project Overview
+This repository contains a **Proof of Concept (PoC)** dashboard developed for the Data Analyst / Engineer position at **Colliers Italia**. The application is a Mass Real Estate Appraisal tool that leverages tree-based Machine Learning (**XGBoost**) and Explainable AI (**SHAP**) to provide transparent, accurate, and scalable property valuations.
 
-### How to run it on your own machine
+The primary goal of this dashboard is to move beyond "black-box" valuation models. By integrating Global and Local Explainability mechanisms, it empowers both technical and non-technical stakeholders to understand exactly *why* a specific property is valued at a certain price.
 
-Prerequisite: install `uv` if you don't already have it.
+## 🚀 Key Features
 
-```
-$ curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+*   **Macro Performance & Feature Importance:** Showcases the champion model's metrics ($R^2$, RMSE, MAPE) outperforming traditional OLS methods. A SHAP Bar Plot dynamically highlights which features positively (Green) or negatively (Red) impact the overall market.
+*   **Micro XAI & "What-If" Simulator:** An interactive simulation engine where users can tweak 11 property parameters (e.g., Gross Area, Building Age, Distance to Bazaars) to see real-time price changes.
+*   **Natural Language Explanation (NLE):** Translates complex SHAP values into business-friendly, readable text summaries.
+*   **Waterfall Price Breakdown:** Visually decomposes the final estimated price step-by-step from the market base value.
 
-1. Sync the dependencies
+## 📁 Dataset & Methodology
+*   **Region:** Mersin / Yenişehir, Turkey.
+*   **Data Points:** 1,181 residential properties.
+*   **Features Used:** 11 critical value determinants (Gross Area, Net Area, Distance to Bazaars, Distance to Coach Station, Building Floors, Floor Number, Number of Bathrooms, Number of Rooms, Building Age, Elevation, Heating System).
+*   **Model:** `XGBRegressor` optimized for predictive accuracy and combined with `shap.TreeExplainer` for interpretability.
 
-   ```
-   $ uv sync
-   ```
+---
 
-2. Run the app
+## 🛠️ How to run it on your own machine
 
-   ```
-   $ uv run streamlit run streamlit_app.py
-   ```
+### Option 1: Standard Python (Pip)
+1. Clone the repository and navigate to the project folder.
+2. Install the required dependencies:
+   ```bash
+   pip install streamlit pandas numpy xgboost shap matplotlib openpyxl
