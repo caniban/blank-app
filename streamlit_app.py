@@ -100,7 +100,7 @@ with tab1:
                 hover_data={"latitude": False, "longitude": False, "Unit_Price": True, "fiyat": True, "brut": True},
                 custom_data=["id"],
                 labels=labels_dict,
-                title="Distribuzione Spaziale (Dimensione punto = Superficie Lorda)"
+                title="Property Explorer"
             )
             fig_map.update_layout(
                 map_style="white-bg",
@@ -123,6 +123,11 @@ with tab1:
                 mapbox_layers=[{"below": 'traces', "sourcetype": "raster", "sourceattribution": "Esri", "source": ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"]}],
                 margin={"r":0,"t":40,"l":0,"b":0}, height=500, mapbox_zoom=12, mapbox_center={"lat": df_map['latitude'].mean(), "lon": df_map['longitude'].mean()}
             )
+
+        fig_map.update_traces(
+            selected=dict(marker=dict(opacity=1)),
+            unselected=dict(marker=dict(opacity=0.85))
+        )
             
         map_event = st.plotly_chart(
             fig_map,
@@ -153,6 +158,7 @@ with tab1:
                 property_labels = {
                     "id": "Identificativo immobile",
                     "mahalle": "Quartiere",
+                    "esposizione": "Esposizione",
                     "brut": "Superficie lorda (mq)",
                     "net": "Superficie netta (mq)",
                     "kat": "Numero del piano",
@@ -178,7 +184,6 @@ with tab1:
                     direction for field, direction in esposizioni.items()
                     if property_data.get(field) == 0
                 ]
-                property_labels["esposizione"] = "Esposizione"
                 property_rows = []
                 for field, label in property_labels.items():
                     if field == "esposizione":
