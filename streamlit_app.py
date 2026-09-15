@@ -164,23 +164,44 @@ with tab1:
                     "Unit_Price": "Prezzo al mq (₺)",
                     "isitma": "Sistema di riscaldamento",
                     "site_ici": "All'interno di un complesso",
-                    "tarih": "Data dell'annuncio",
                     "balkon": "Balcone",
                     "asansor": "Ascensore",
-                    "cephe_K": "Esposizione nord",
-                    "cephe_B": "Esposizione sud",
-                    "cephe_D": "Esposizione est",
-                    "cephe_G": "Esposizione ovest",
                     "deniz_man": "Vista mare",
-                    "nizam": "Tipologia edilizia",
-                    "longitude": "Longitudine",
-                    "latitude": "Latitudine"
                 }
+                esposizioni = {
+                    "cephe_K": "Nord",
+                    "cephe_B": "Sud",
+                    "cephe_D": "Est",
+                    "cephe_G": "Ovest"
+                }
+                esposizioni_presenti = [
+                    direction for field, direction in esposizioni.items()
+                    if property_data.get(field) == 0
+                ]
+                property_labels["esposizione"] = "Esposizione"
                 property_rows = []
                 for field, label in property_labels.items():
-                    if field in property_data.index:
+                    if field == "esposizione":
+                        value = ", ".join(esposizioni_presenti) or "Non specificata"
+                    elif field in property_data.index:
                         value = property_data[field]
-                        if field == "fiyat":
+                        if field == "oda_sayisi":
+                            value = int(value)
+                        elif field == "isitma":
+                            value = {
+                                0: "Nessun sistema",
+                                1: "Aria condizionata",
+                                2: "Caldaia a gas"
+                            }.get(value, "Non specificato")
+                        elif field == "site_ici":
+                            value = {0: "Sì", 1: "No"}.get(value, "Non specificato")
+                        elif field == "asansor":
+                            value = {0: "Sì", 1: "No"}.get(value, "Non specificato")
+                        elif field == "deniz_man":
+                            value = {0: "Sì", 1: "No"}.get(value, "Non specificato")
+                        elif field == "balkon":
+                            value = {0: "Sì", 1: "No"}.get(value, "Non specificato")
+                        elif field == "fiyat":
                             value = f"₺ {value:,.0f}"
                         elif field == "Unit_Price":
                             value = f"₺ {value:,.0f}"
@@ -188,7 +209,7 @@ with tab1:
                             value = f"{value:,.0f} mq"
                         property_rows.append({"Informazione": label, "Valore": value})
 
-                st.markdown(f"### Property #{property_data['id']}")
+                st.markdown(f"### Immobile #{property_data['id']}")
                 st.dataframe(
                     pd.DataFrame(property_rows),
                     hide_index=True,
