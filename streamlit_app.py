@@ -316,10 +316,10 @@ with tab3:
         st.success(f"### Valore Stimato: ₺ {pred:,.0f} TRY")
         
         shap_values_single = explainer(input_df)
-        fig2, ax2 = plt.subplots(figsize=(9, 6))
+        fig2 = plt.figure(figsize=(9, 6))
         shap.plots.waterfall(shap_values_single[0], max_display=15, show=False)
-        st.pyplot(fig2)
-        plt.clf()
+        st.pyplot(fig2, clear_figure=True)
+        plt.close(fig2)
 
 # TAB 4: BI (GENİŞLETİLMİŞ GRAFİKLER)
 with tab4:
