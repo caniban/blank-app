@@ -18,6 +18,8 @@ def load_and_prep_data():
     df_map = pd.read_csv("yenisehir_numuneler.csv")
     
     df_map = df_map.dropna(subset=['latitude', 'longitude'])
+    turkish_to_ascii = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
+    df_map['mahalle'] = df_map['mahalle'].astype(str).str.translate(turkish_to_ascii)
     df_map['Unit_Price'] = (df_map['fiyat'] / df_map['brut']).astype(int)
     
     return df_model, df_map
@@ -327,8 +329,8 @@ with tab4:
     # 1. SATIR: LOLLIPOP GRAFİĞİ (ORTALAMA METREKARE FİYATI)
     target_hoods = {
         "fuatmorel": "Fuatmorel",
-        "batikent": "Batıkent",
-        "ciftlikkoy": "Çiftlikköy",
+        "batikent": "Batikent",
+        "ciftlikkoy": "Ciftlikkoy",
     }
     df_map['mahalle_key'] = df_map['mahalle'].astype(str).str.strip().str.lower()
     hood_stats = (
@@ -377,8 +379,8 @@ with tab4:
     age_data = pd.DataFrame({
         "Fascia d'Età": ["0-14", "15-29", "30-44", "45-59", "60+"],
         "Fuatmorel": [3056, 2321, 2642, 2537, 1295],
-        "Batıkent": [3208, 2652, 3524, 2500, 1592],
-        "Çiftlikköy": [4305, 15292, 6977, 4527, 2472]
+        "Batikent": [3208, 2652, 3524, 2500, 1592],
+        "Ciftlikkoy": [4305, 15292, 6977, 4527, 2472]
     })
     
     col_age1, col_age2, col_age3 = st.columns(3)
@@ -388,13 +390,13 @@ with tab4:
         fig_age1 = px.pie(age_data, values="Fuatmorel", names="Fascia d'Età", hole=0.5, title="Fuatmorel", color_discrete_sequence=colors_age)
         st.plotly_chart(fig_age1, use_container_width=True)
     with col_age2:
-        fig_age2 = px.pie(age_data, values="Batıkent", names="Fascia d'Età", hole=0.5, title="Batıkent", color_discrete_sequence=colors_age)
+        fig_age2 = px.pie(age_data, values="Batikent", names="Fascia d'Età", hole=0.5, title="Batikent", color_discrete_sequence=colors_age)
         st.plotly_chart(fig_age2, use_container_width=True)
     with col_age3:
-        fig_age3 = px.pie(age_data, values="Çiftlikköy", names="Fascia d'Età", hole=0.5, title="Çiftlikköy", color_discrete_sequence=colors_age)
+        fig_age3 = px.pie(age_data, values="Ciftlikkoy", names="Fascia d'Età", hole=0.5, title="Ciftlikkoy", color_discrete_sequence=colors_age)
         st.plotly_chart(fig_age3, use_container_width=True)
         
-    st.info("💡 **Insight:** Notare l'esplosione della fascia 15-29 anni a Çiftlikköy, indicativa di una forte concentrazione studentesca (Campus Universitario).")
+    st.info("💡 **Insight:** Notare l'esplosione della fascia 15-29 anni a Ciftlikkoy, indicativa di una forte concentrazione studentesca (Campus Universitario).")
 
     st.divider()
 
@@ -406,8 +408,8 @@ with tab4:
         edu_data = pd.DataFrame({
             "Livello": ["Superiore", "Laurea", "Master", "Dottorato"],
             "Fuatmorel": [2377, 2627, 572, 150],
-            "Batıkent": [2851, 3154, 485, 61],
-            "Çiftlikköy": [14145, 7433, 1472, 300]
+            "Batikent": [2851, 3154, 485, 61],
+            "Ciftlikkoy": [14145, 7433, 1472, 300]
         }).melt(id_vars="Livello", var_name="Quartiere", value_name="Persone")
         
         fig_edu = px.bar(edu_data, x="Livello", y="Persone", color="Quartiere", barmode="group",
@@ -418,8 +420,8 @@ with tab4:
         marital_data = pd.DataFrame({
             "Stato Civile": ["Sposato", "Single", "Divorziato", "Vedovo"],
             "Fuatmorel": [5614, 2349, 565, 267],
-            "Batıkent": [6388, 2808, 653, 419],
-            "Çiftlikköy": [10077, 16351, 2227, 613]
+            "Batikent": [6388, 2808, 653, 419],
+            "Ciftlikkoy": [10077, 16351, 2227, 613]
         }).melt(id_vars="Stato Civile", var_name="Quartiere", value_name="Totale")
         
         fig_mar = px.bar(marital_data, x="Quartiere", y="Totale", color="Stato Civile", barmode="stack",
@@ -429,7 +431,7 @@ with tab4:
     with col_b2:
         st.subheader("Dinamiche Immobiliari (Turnover & Vendite)")
         re_data = pd.DataFrame({
-            "Quartiere": ["Fuatmorel", "Batıkent", "Çiftlikköy"],
+            "Quartiere": ["Fuatmorel", "Batikent", "Ciftlikkoy"],
             "Turnover (%)": [5.72, 5.48, 7.21],
             "Vendite Annuali": [244, 270, 1252]
         })
@@ -449,8 +451,8 @@ with tab4:
         socioeconomico_data = pd.DataFrame({
             "Gruppo": ["A+", "A", "B", "C", "D"],
             "Fuatmorel": [1318, 2275, 2536, 4158, 1564],
-            "Batıkent": [1258, 2745, 3089, 4643, 1741],
-            "Çiftlikköy": [3499, 6623, 15593, 5919, 1939]
+            "Batikent": [1258, 2745, 3089, 4643, 1741],
+            "Ciftlikkoy": [3499, 6623, 15593, 5919, 1939]
         }).melt(id_vars="Gruppo", var_name="Quartiere", value_name="Persone")
         socioeconomico_data["Percentuale"] = (
             socioeconomico_data["Persone"]
@@ -542,8 +544,8 @@ with tab5:
         decision_data = pd.DataFrame({
             "Criteri": ["Ambiente Familiare (Sposati)", "Profilo Elite (Gruppo A/Reddito)", "Tranquillità (Bassa Densità)", "Budget-Friendly (Costo/mq)"],
             "Fuatmorel": [9, 10, 10, 6],
-            "Batıkent": [9, 7, 5, 8],
-            "Çiftlikköy": [3, 9, 8, 8] # Çiftlikköy evli puanı düşük (bekar çok)
+            "Batikent": [9, 7, 5, 8],
+            "Ciftlikkoy": [3, 9, 8, 8] # Ciftlikkoy evli puanı düşük (bekar çok)
         })
         decision_data = decision_data.set_index("Criteri")
         
