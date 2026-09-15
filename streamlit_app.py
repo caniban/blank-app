@@ -98,6 +98,7 @@ with tab1:
                 size="brut", size_max=15,
                 hover_name="mahalle", 
                 hover_data={"latitude": False, "longitude": False, "Unit_Price": True, "fiyat": True, "brut": True},
+                custom_data=["id"],
                 labels=labels_dict,
                 title="Distribuzione Spaziale (Dimensione punto = Superficie Lorda)"
             )
@@ -113,6 +114,7 @@ with tab1:
                 size="brut", size_max=15,
                 hover_name="mahalle", 
                 hover_data={"latitude": False, "longitude": False, "Unit_Price": True, "fiyat": True, "brut": True},
+                custom_data=["id"],
                 labels=labels_dict,
                 title="Distribuzione Spaziale (Dimensione punto = Superficie Lorda)"
             )
@@ -122,16 +124,87 @@ with tab1:
                 margin={"r":0,"t":40,"l":0,"b":0}, height=500, mapbox_zoom=12, mapbox_center={"lat": df_map['latitude'].mean(), "lon": df_map['longitude'].mean()}
             )
             
-        st.plotly_chart(fig_map, use_container_width=True)
+        map_event = st.plotly_chart(
+            fig_map,
+            use_container_width=True,
+            key="property_map",
+            on_select="rerun",
+            selection_mode="points"
+        )
+
+        selected_points = map_event.selection.points if map_event else []
+        if selected_points:
+            selected_point = selected_points[0]
+            point_index = selected_point.get("point_index")
+            if point_index is None:
+                point_index = selected_point.get("pointNumber")
+
+            if point_index is not None and int(point_index) < len(df_map):
+                selected_property = df_map.iloc[[int(point_index)]]
+            else:
+                selected_customdata = selected_point.get("customdata")
+                if isinstance(selected_customdata, (list, tuple)):
+                    selected_customdata = selected_customdata[0]
+                selected_property = df_map[
+                    df_map["id"].astype(str) == str(selected_customdata)
+                ]
+            if not selected_property.empty:
+                property_data = selected_property.iloc[0]
+                property_labels = {
+                    "id": "Identificativo immobile",
+                    "mahalle": "Quartiere",
+                    "brut": "Superficie lorda (mq)",
+                    "net": "Superficie netta (mq)",
+                    "kat": "Numero del piano",
+                    "bina_kat": "Piani dell'edificio",
+                    "banyo_sayi": "Numero di bagni",
+                    "oda_sayisi": "Numero di stanze",
+                    "bina_yasi": "Età dell'edificio",
+                    "fiyat": "Prezzo attuale (₺)",
+                    "Unit_Price": "Prezzo al mq (₺)",
+                    "isitma": "Sistema di riscaldamento",
+                    "site_ici": "All'interno di un complesso",
+                    "tarih": "Data dell'annuncio",
+                    "balkon": "Balcone",
+                    "asansor": "Ascensore",
+                    "cephe_K": "Esposizione nord",
+                    "cephe_B": "Esposizione sud",
+                    "cephe_D": "Esposizione est",
+                    "cephe_G": "Esposizione ovest",
+                    "deniz_man": "Vista mare",
+                    "nizam": "Tipologia edilizia",
+                    "longitude": "Longitudine",
+                    "latitude": "Latitudine"
+                }
+                property_rows = []
+                for field, label in property_labels.items():
+                    if field in property_data.index:
+                        value = property_data[field]
+                        if field == "fiyat":
+                            value = f"₺ {value:,.0f}"
+                        elif field == "Unit_Price":
+                            value = f"₺ {value:,.0f}"
+                        elif field in {"brut", "net"}:
+                            value = f"{value:,.0f} mq"
+                        property_rows.append({"Informazione": label, "Valore": value})
+
+                st.markdown(f"### Property #{property_data['id']}")
+                st.dataframe(
+                    pd.DataFrame(property_rows),
+                    hide_index=True,
+                    use_container_width=True
+                )
+        else:
+            st.info("Seleziona un punto sulla mappa per esplorare tutti i dati dell'immobile.")
 
 # TAB 2: MAKRO & XAI AÇIKLAMASI
 with tab2:
-    st.header("L'Evoluzione dell'AI: Da Black Box a Glass Box")
+    st.header("IA Tradizionale vs IA Spiegabile")
     
     col_xai1, col_xai2 = st.columns([1, 1.2])
     with col_xai1:
         try:
-            st.image("ai_spiegabile.png", caption="Confronto Architetturale: Tradizionale vs Spiegabile", use_container_width=True)
+            st.image("ai_spiegabile.png", caption="Da Black Box a Glass Box", use_container_width=True)
         except:
             st.warning("Immagine 'ai_spiegabile.png' non trovata.")
             
@@ -411,7 +484,7 @@ with tab5:
     col_a1, col_a2 = st.columns([1.3, 1])
     
     with col_a1:
-        st.markdown("### 🎯 Ricerca dello 'Sweet Spot' (Area Ideale)")
+        st.markdown("### Ricerca dello 'Sweet Spot' (Area Ideale)")
         # Dağılım Grafiği - Eksenler sınırlandırıldı ve hedef kutu (Target) netleştirildi
         fig_budget = px.scatter(
             df_model, x="Gross Area", y="Price (TRY)", color="Building Age",
